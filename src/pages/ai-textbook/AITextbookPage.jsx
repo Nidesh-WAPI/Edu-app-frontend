@@ -3,6 +3,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getSyllabuses, getClasses, getSubjects } from '@/api/config.api';
 import { sendChatMessage, requestDeepDive } from '@/api/ai.api';
+import useSpeech from '@/hooks/useSpeech';
+import { playCorrect, playWrong } from '@/hooks/useSounds';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    ICONS
@@ -144,6 +146,7 @@ function TopicCards({ topics, onSelect }) {
 function ChatBubble({ message, onTopicSelect }) {
   const isUser = message.role === 'user';
   const topics = !isUser ? extractTopics(message.content) : [];
+  const { speak, stop, speaking, supported } = useSpeech();
 
   return (
     <div>
@@ -167,9 +170,40 @@ function ChatBubble({ message, onTopicSelect }) {
               </ReactMarkdown>
             </div>
           )}
-          <p className={`mt-1.5 text-right text-[10px] ${isUser ? 'text-indigo-200' : 'text-gray-400'}`}>
-            {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </p>
+          <div className={`mt-1.5 flex items-center justify-between ${isUser ? '' : ''}`}>
+            <p className={`text-[10px] ${isUser ? 'text-indigo-200' : 'text-gray-400'}`}>
+              {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </p>
+            {/* Read Aloud button — bot messages only */}
+            {!isUser && supported && (
+              <button
+                onClick={() => speaking ? stop() : speak(message.content)}
+                title={speaking ? 'Stop reading' : 'Read aloud'}
+                className={`flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                  speaking
+                    ? 'bg-indigo-100 text-indigo-700'
+                    : 'text-gray-400 hover:text-indigo-500 hover:bg-indigo-50'
+                }`}
+              >
+                {speaking ? (
+                  <>
+                    <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                      <rect x="6" y="6" width="4" height="12" rx="1" />
+                      <rect x="14" y="6" width="4" height="12" rx="1" />
+                    </svg>
+                    Stop
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M12 6v12m0 0l-3-3m3 3l3-3M6.343 9.343a8 8 0 000 5.314" />
+                    </svg>
+                    Read aloud
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -228,7 +262,8 @@ function QuizComponent({ questions, onComplete }) {
     if (answered) return;
     setSelected(i);
     setAnswered(true);
-    if (i === q.correct) setScore((s) => s + 1);
+    if (i === q.correct) { setScore((s) => s + 1); playCorrect(); }
+    else                  { playWrong(); }
   };
 
   const handleNext = () => {

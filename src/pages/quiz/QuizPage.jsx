@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getSyllabuses, getClasses, getSubjects, getChapters } from '@/api/config.api';
 import { generateQuiz, submitQuiz } from '@/api/quiz.api';
+import { playCorrect, playWrong, playComplete } from '@/hooks/useSounds';
 
 /* ── Constants ──────────────────────────────────────────────────────────────── */
 const MIN_Q = 5;
@@ -349,6 +350,8 @@ function QuizTakingScreen({ questions, meta, onFinish }) {
     if (revealed) return;
     setSelected(i);
     setRevealed(true);
+    if (i === q.correct) playCorrect();
+    else                 playWrong();
   };
 
   const handleNext = () => {
@@ -371,6 +374,7 @@ function QuizTakingScreen({ questions, meta, onFinish }) {
       setRevealed(false);
       contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
+      playComplete();
       onFinish({ answers: newAnswers, timeTakenSeconds: seconds, meta });
     }
   };
