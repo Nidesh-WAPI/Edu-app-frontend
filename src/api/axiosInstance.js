@@ -3,7 +3,9 @@ import { store } from '../store/store';
 import { logout } from '../store/authSlice';
 
 const axiosInstance = axios.create({
-  baseURL: '/api/v1',
+  // In production the env var is baked in by Vite at build time.
+  // In development Vite proxies /api → localhost:5001 so the relative path works.
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   headers: { 'Content-Type': 'application/json' },
 });
 
