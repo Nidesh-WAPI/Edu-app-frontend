@@ -50,7 +50,7 @@ const tabs = [
 
 export default function BottomNav() {
   return (
-    <nav className="safe-bottom flex-shrink-0 border-t border-gray-100 bg-white/95 backdrop-blur-md">
+    <nav className="md:hidden safe-bottom flex-shrink-0 border-t border-gray-100 bg-white/95 backdrop-blur-md">
       <div className="flex items-center justify-around px-2 py-2">
         {tabs.map((tab) => (
           <NavLink

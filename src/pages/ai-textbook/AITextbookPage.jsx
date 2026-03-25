@@ -809,6 +809,10 @@ function SubjectSelector({ onStart }) {
 ───────────────────────────────────────────────────────────────────────────── */
 export default function AITextbookPage() {
   const [selection, setSelection] = useState(null);
-  if (selection) return <ChatScreen {...selection} onBack={() => setSelection(null)} />;
+
+  if (selection) {
+    return <ChatScreen {...selection} onBack={() => setSelection(null)} />;
+  }
+
   return <SubjectSelector onStart={setSelection} />;
 }

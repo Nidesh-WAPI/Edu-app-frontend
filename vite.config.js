@@ -11,10 +11,10 @@ export default defineConfig({
     alias: { '@': path.resolve(__dirname, 'src') },
   },
   server: {
-    port: 5175,
+    port: 5201,
     strictPort: true,
     proxy: {
-      '/api': { target: 'http://localhost:5001', changeOrigin: true },
+      '/api': { target: 'http://localhost:5002', changeOrigin: true },
     },
   },
 });

@@ -22,6 +22,10 @@ const getCtx = () => {
   return audioCtx;
 };
 
+// Call this on the first user tap to pre-warm AudioContext so sounds
+// play immediately — critical for kids mode where sounds are expected.
+export const unlockAudio = () => { getCtx(); };
+
 const tone = (freq, duration, type = 'sine', vol = 0.25, startDelay = 0) => {
   const ctx = getCtx();
   if (!ctx) return;
